@@ -375,7 +375,12 @@ class Table
 		$data = $this->process_data($data);
 
 		$sql = new SQLBuilder($this->conn,$this->get_fully_qualified_table_name());
-		$sql->delete($data);
+		//stop activerecord from deleting the row.
+		//$sql->delete($data);
+		//set deleted to true
+		$sql->update("`deleted` = '1'")->where($data);
+		//set deleted_at to the current timestamp
+		$sql->update("`deleted_at` = '".time()."'")->where($data);
 
 		$values = $sql->bind_values();
 		return $this->conn->query(($this->last_sql = $sql->to_s()),$values);
